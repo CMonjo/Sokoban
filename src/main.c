@@ -67,17 +67,28 @@ int calcul_lign(info_t *info)
 
 void modified_map(info_t *info, int pos_p, int var)
 {
-	char tmp = ' ';
+	int tmp = 0;
 
-	if (info->map[var] != '#' && info->map[var] != 'X' && info->map[var] != 'O') {
+	if (info->map[var] == 'O') {
+		tmp = pos_p;
 		info->map[pos_p] = ' ';
 		info->map[var] = 'P';
 	}
-	if (info->map[var] == 'X' && info->map[var] != '#' && info->map[var] != 'O') {
-		tmp = 'X';
+	if (tmp == pos_p)
+		info->map[tmp] = 'O';
+	if (info->map[var] != '#' && info->map[var] != 'X') {
 		info->map[pos_p] = ' ';
 		info->map[var] = 'P';
-		info->map[var] = tmp;
+	}
+	if (info->map[var] == 'X' && info->map[var + (var - pos_p)] == ' ' && info->map[var] != '#'/* && info->map[var] != 'O'*/) {
+		info->map[pos_p] = ' ';
+		info->map[var] = 'P';
+		info->map[var + (var - pos_p)] = 'X';
+	}
+	if (info->map[var] == 'X' && info->map[var + (var - pos_p)] == 'O' && info->map[var] != '#') {
+		info->map[pos_p] = ' ';
+		info->map[var] = 'P';
+		info->map[var + (var - pos_p)] = 'X';
 	}
 }
 
