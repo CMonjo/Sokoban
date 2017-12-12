@@ -9,7 +9,7 @@ CC	=	gcc
 
 CFLAGS	=	-Wextra -W -Wall -Werror -I ./include/
 
-LIB	=	-lncurses
+LIB	=	-L lib/ -lmy -lncurses
 
 SRC	=	src/main.c
 
@@ -20,6 +20,7 @@ NAME	=	my_sokoban
 all: $(NAME)
 
 $(NAME): $(OBJ)
+	make -C lib/my/
 	$(CC) $(OBJ) $(CFLAGS) $(LIB) -o $(NAME)
 	rm -f $(OBJ)
 

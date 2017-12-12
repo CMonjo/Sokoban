@@ -27,4 +27,6 @@
 	#include <string.h>
 	#include <ncurses.h>
 	#include <fcntl.h>
+	#include "my.h"
+	#include "struct.h"
 #endif
