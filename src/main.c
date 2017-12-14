@@ -7,23 +7,49 @@
 
 #include "main.h"
 
-void detection_file(char *filepath)
+int count_obj(int nb_x, int nb_o, int player)
 {
-	int detect = open(filepath, O_RDONLY);
-
-	if (detect == -1 )
+	if (nb_x != nb_o || nb_o != nb_x || player != 1)
 		exit (84);
+	return (0);
 }
 
-char *open_map(char *filepath)
+void verify_map(info_t *info)
 {
-	int fd = open(filepath, O_RDONLY);
-	char *buffer  = malloc(sizeof(char) * 1000000 + 1);
-	int rd = 0;
+	int i = 0;
+	int nb_x = 0;
+	int nb_o = 0;
+	int player = 0;
 
-	rd = read(fd, buffer, 1000001);
-	close(fd);
-	return (buffer);
+	while (info->map[i] != '\0') {
+		switch(info->map[i]) {
+			case 'P':
+				player++;
+				break;
+			case 'X':
+				nb_x++;
+				break;
+			case 'O':
+				nb_o++;
+				break;
+		}
+		i++;
+	}
+	count_obj(nb_x, nb_o, player);
+}
+
+int victory(info_t *info)
+{
+	int i = 0;
+
+	while (info->pos_o[i] != -1) {
+		if (info->map[info->pos_o[i]] == 'X')
+			i++;
+		else
+			return (0);
+	}
+	info->key = 0;
+	return (0);
 }
 
 int find_player(info_t *info)
@@ -35,6 +61,21 @@ int find_player(info_t *info)
 	return (i);
 }
 
+void find_o(info_t *info)
+{
+	int i = 0;
+	int j = 0;
+
+	while (info->map[i] != '\0') {
+		if (info->map[i] == 'O') {
+			info->pos_o[j] = i;
+			j++;
+		}
+		i++;
+	}
+	info->pos_o[j] = -1;
+}
+
 int calcul_lign(info_t *info)
 {
 	int i = 0;
@@ -44,90 +85,80 @@ int calcul_lign(info_t *info)
 	return (i);
 }
 
-/*struct sokoban_t shifting_bryan(struct sokoban_t sb, int bryan, int new_statement, char keyboard)
+void modified_map(info_t *info, int pos_p, int next)
 {
-	char alt = ' ';
+	int j = 0;
 
-	sb.output = keyboard;
-	if (sb.map[new_statement] != '#' && sb.map[new_statement] != 'X' && sb.map[new_statement] != 'O') {
-		if (sb.map[new_statement] == 'O') {
-			sb.key -= 1;
-		}
-		alt = sb.map[new_statement];
-		sb.map[new_statement] = sb.map[bryan];
-		sb.map[bryan] = sb.temp;
-	}
-	if (sb.map[new_statement] == 'X' && sb.map[new_statement + sb.output] != '#' &&
-	sb.map[new_statement + sb.output] != 'X') {
-	move_block(sb, new_statement, bryan);
-	}
-	sb.temp = alt;
-	return (sb);
-}*/
-
-void modified_map(info_t *info, int pos_p, int var)
-{
-	int tmp = 0;
-
-	if (info->map[var] == 'O') {
-		tmp = pos_p;
+	if (info->map[next] == 'O') {
 		info->map[pos_p] = ' ';
-		info->map[var] = 'P';
+		info->map[next] = 'P';
 	}
-	if (tmp == pos_p)
-		info->map[tmp] = 'O';
-	if (info->map[var] != '#' && info->map[var] != 'X') {
+	if (info->map[next] != '#' && info->map[next] != 'X' && info->map[next] != 'O') {
 		info->map[pos_p] = ' ';
-		info->map[var] = 'P';
+		info->map[next] = 'P';
 	}
-	if (info->map[var] == 'X' && info->map[var + (var - pos_p)] == ' ' && info->map[var] != '#'/* && info->map[var] != 'O'*/) {
+	if (info->map[next] == 'X' && info->map[next + (next - pos_p)] == ' ' && info->map[next] != '#') {
 		info->map[pos_p] = ' ';
-		info->map[var] = 'P';
-		info->map[var + (var - pos_p)] = 'X';
+		info->map[next] = 'P';
+		info->map[next + (next - pos_p)] = 'X';
 	}
-	if (info->map[var] == 'X' && info->map[var + (var - pos_p)] == 'O' && info->map[var] != '#') {
+	if (info->map[next] == 'X' && info->map[next + (next - pos_p)] == 'O' && info->map[next] != '#') {
 		info->map[pos_p] = ' ';
-		info->map[var] = 'P';
-		info->map[var + (var - pos_p)] = 'X';
+		info->map[next] = 'P';
+		info->map[next + (next - pos_p)] = 'X';
+	}
+	for (; info->pos_o[j] != -1; j++) {
+		if (info->map[info->pos_o[j]] == ' ')
+			info->map[info->pos_o[j]] = 'O';
 	}
 }
 
-void my_touch(info_t *info, int pos_p, int lign)
+void my_touch(info_t *info, int pos_p, int lign, char **av)
 {
 	switch(getch()) {
-		case 'z':
+		case KEY_UP:
 			modified_map(info, pos_p, pos_p - lign);
 			break;
-		case 's':
+		case KEY_DOWN:
 			modified_map(info, pos_p, pos_p + lign);
 			break;
-		case 'q':
+		case KEY_LEFT:
 			modified_map(info, pos_p, pos_p - 1);
 			break;
-		case 'd':
+		case KEY_RIGHT:
 			modified_map(info, pos_p, pos_p + 1);
 			break;
 		case 32:
-			info->key = 0;
+			info->map = open_map(av[1]);
 			break;
 	}
+}
+
+void init(info_t *info, char **av)
+{
+	info->key = 1;
+	info->pos_o = malloc(sizeof(int *) * 1000);
+	info->pos_x = malloc(sizeof(int *) * 1000);
+	info->map = malloc(sizeof(char *) * 1000000 + 1);
+	info->map = open_map(av[1]);
+	verify_map(info);
 }
 
 void my_sokoban(char **av, info_t *info)
 {
 	int lign = 0;
 	int pos_p = 0;
-	info->key = 1;
-	info->map = malloc(sizeof(char *) * 1000000 + 1);
-	info->map = open_map(av[1]);
 	lign = calcul_lign(info) + 1;
+	find_o(info);
 	initscr();
+	keypad(stdscr, TRUE);
 	curs_set(FALSE);
 	while (info->key == 1) {
 		pos_p = find_player(info);
 		printw(info->map);
 		noecho();
-		my_touch(info, pos_p, lign);
+		my_touch(info, pos_p, lign, av);
+		victory(info);
 		refresh();
 		clear ();
 	}
@@ -145,11 +176,11 @@ int main(int ac, char **av)
 	if (ac < 2 || ac > 2)
 		return (84);
 	if (my_strlen(av[1]) == 2 && av[1][0] == '-' && av[1][1] == 'h') {
-		fd = open("info.txt", O_RDONLY);
+		fd = open("txt/info.txt", O_RDONLY);
 		rd = read(fd, buffer, 185);
 		write(1, buffer, rd);
 	} else {
-		detection_file(av[1]);
+		init(info, av);
 		my_sokoban(av, info);
 	}
 	return (0);

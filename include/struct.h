@@ -12,8 +12,9 @@
 
 typedef struct info_s {
 	char *map;
+	int *pos_o;
+	int *pos_x;
 	int key;
-	//x, y pour le O ?
 } info_t;
 
 #endif
