@@ -7,112 +7,6 @@
 
 #include "main.h"
 
-int count_obj(int nb_x, int nb_o, int player)
-{
-	if (nb_x != nb_o || nb_o != nb_x || player != 1)
-		exit (84);
-	return (0);
-}
-
-void verify_map(info_t *info)
-{
-	int i = 0;
-	int nb_x = 0;
-	int nb_o = 0;
-	int player = 0;
-
-	while (info->map[i] != '\0') {
-		switch(info->map[i]) {
-			case 'P':
-				player++;
-				break;
-			case 'X':
-				nb_x++;
-				break;
-			case 'O':
-				nb_o++;
-				break;
-		}
-		i++;
-	}
-	count_obj(nb_x, nb_o, player);
-}
-
-int victory(info_t *info)
-{
-	int i = 0;
-
-	while (info->pos_o[i] != -1) {
-		if (info->map[info->pos_o[i]] == 'X')
-			i++;
-		else
-			return (0);
-	}
-	info->key = 0;
-	return (0);
-}
-
-int find_player(info_t *info)
-{
-	int i = 0;
-
-	while (info->map[i] != 'P')
-		i++;
-	return (i);
-}
-
-void find_o(info_t *info)
-{
-	int i = 0;
-	int j = 0;
-
-	while (info->map[i] != '\0') {
-		if (info->map[i] == 'O') {
-			info->pos_o[j] = i;
-			j++;
-		}
-		i++;
-	}
-	info->pos_o[j] = -1;
-}
-
-int calcul_lign(info_t *info)
-{
-	int i = 0;
-
-	while (info->map[i] != '\n')
-		i++;
-	return (i);
-}
-
-void modified_map(info_t *info, int pos_p, int next)
-{
-	int j = 0;
-
-	if (info->map[next] == 'O') {
-		info->map[pos_p] = ' ';
-		info->map[next] = 'P';
-	}
-	if (info->map[next] != '#' && info->map[next] != 'X' && info->map[next] != 'O') {
-		info->map[pos_p] = ' ';
-		info->map[next] = 'P';
-	}
-	if (info->map[next] == 'X' && info->map[next + (next - pos_p)] == ' ' && info->map[next] != '#') {
-		info->map[pos_p] = ' ';
-		info->map[next] = 'P';
-		info->map[next + (next - pos_p)] = 'X';
-	}
-	if (info->map[next] == 'X' && info->map[next + (next - pos_p)] == 'O' && info->map[next] != '#') {
-		info->map[pos_p] = ' ';
-		info->map[next] = 'P';
-		info->map[next + (next - pos_p)] = 'X';
-	}
-	for (; info->pos_o[j] != -1; j++) {
-		if (info->map[info->pos_o[j]] == ' ')
-			info->map[info->pos_o[j]] = 'O';
-	}
-}
-
 void my_touch(info_t *info, int pos_p, int lign, char **av)
 {
 	switch(getch()) {
@@ -158,6 +52,7 @@ void my_sokoban(char **av, info_t *info)
 		printw(info->map);
 		noecho();
 		my_touch(info, pos_p, lign, av);
+		box_blocked(info);
 		victory(info);
 		refresh();
 		clear ();

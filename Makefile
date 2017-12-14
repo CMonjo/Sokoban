@@ -11,9 +11,11 @@ CFLAGS	=	-Wextra -W -Wall -I ./include/
 
 LIB	=	-L lib/ -lmy -lncurses
 
-SRC	=	src/main.c	\
-		src/open_file.c	\
-		
+SRC	=	src/main.c		\
+		src/detection.c		\
+		src/game_end.c		\
+		src/info_map.c		\
+		src/modified_map.c
 
 OBJ	=	$(SRC:.c=.o)
 

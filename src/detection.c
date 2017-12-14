@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2017
 ** Project Sokoban
 ** File description:
-** Main file
+** Detection file
 */
 
 #include "main.h"
