@@ -7,6 +7,7 @@
 
 #include "main.h"
 
+
 int victory(info_t *info)
 {
 	int i = 0;
@@ -21,13 +22,28 @@ int victory(info_t *info)
 	return (0);
 }
 
+void find_x(info_t *info)
+{
+	int i = 0;
+	int j = 0;
+
+	while (info->map[i] != '\0') {
+		if (info->map[i] == 'X') {
+			info->pos_x[j] = i;
+			j++;
+		}
+		i++;
+	}
+	info->pos_x[j] = -1;
+}
+
 int box_blocked(info_t *info)
 {
 	int i = 0;
 
-	while (info->map[i] != '\0') {
-		if (info->map[i])
-			i++;
+	for (i = 0; info->map[i] != '\0'; i++) {
+		if (info->map[info->pos_x[i]] + 1 == '#')
+			exit (1);
 	}
-	return (1);
+	return (0);
 }

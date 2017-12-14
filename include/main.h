@@ -34,7 +34,7 @@
 	void find_o(info_t *info);
 	int calcul_lign(info_t *info);
 	void verify_map(info_t *info);
-	int count_obj(int nb_x, int nb_o, int player);
+	int count_obj(info_t *info, int nb_x, int nb_o, int player);
 	int victory(info_t *info);
 	void modified_o_in_map(info_t *info, int pos_p, int next);
 	void modified_map(info_t *info, int pos_p, int next);

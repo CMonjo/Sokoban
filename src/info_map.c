@@ -40,9 +40,20 @@ int calcul_lign(info_t *info)
 	return (i);
 }
 
-int count_obj(int nb_x, int nb_o, int player)
+int count_obj(info_t *info, int nb_x, int nb_o, int player)
 {
-	if (nb_x != nb_o || nb_o != nb_x || player != 1)
+	int i = 0;
+
+	while (info->map[i] != '\0') {
+		if (info->map[i] == ' ' || info->map[i] == '#' ||
+		info->map[i] == 'O' || info->map[i] == 'P' || info->map[i]
+		== 'X' || info->map[i] == '\0' || info->map[i] == '\n')
+			i++;
+		else
+			exit (84);
+	}
+	if (nb_x != nb_o || nb_o != nb_x || player != 1 ||
+		nb_x == 0|| nb_o == 0)
 		exit (84);
 	return (0);
 }
@@ -68,5 +79,5 @@ void verify_map(info_t *info)
 		}
 		i++;
 	}
-	count_obj(nb_x, nb_o, player);
+	count_obj(info, nb_x, nb_o, player);
 }
